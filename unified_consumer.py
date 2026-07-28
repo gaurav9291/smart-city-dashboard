@@ -27,7 +27,10 @@ spark = SparkSession.builder \
     .config("spark.sql.shuffle.partitions", "4") \
     .getOrCreate()
 
-spark.sparkContext.setLogLevel("WARN")
+try:
+    spark.sparkContext.setLogLevel("WARN")
+except Exception as exc:
+    print(f"SparkContext log-level setup skipped: {exc}")
 
 ELASTICSEARCH_URL = get_elasticsearch_url()
 ELASTICSEARCH_INDEX = get_elasticsearch_index()
