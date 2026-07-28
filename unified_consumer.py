@@ -43,7 +43,7 @@ STREAM_TRIGGER = os.getenv("STREAM_TRIGGER", "processingTime").strip().lower()
 STREAM_PROCESSING_TIME = os.getenv("STREAM_PROCESSING_TIME", "30 seconds")
 CHECKPOINT_LOCATION = os.getenv(
     "CHECKPOINT_LOCATION",
-    "dbfs:/tmp/smart-city-unified-checkpoint",
+    "/Volumes/workspace/default/smart_city_checkpoints/unified_consumer",
 )
 LOCAL_TIMEZONE = ZoneInfo("Asia/Kolkata")
 EXPECTED_ZONES = ["fc road", "hadapsar", "hinjewadi", "kothrud", "shivajinagar"]

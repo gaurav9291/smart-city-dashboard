@@ -339,7 +339,7 @@ os.environ["KAFKA_SASL_MECHANISM"] = "PLAIN"
 os.environ["KAFKA_TOPICS"] = "aqi-data,traffic-data,weather-data"
 os.environ["KAFKA_STARTING_OFFSETS"] = "latest"
 os.environ["STREAM_TRIGGER"] = "availableNow"
-os.environ["CHECKPOINT_LOCATION"] = "dbfs:/tmp/smart-city-unified-checkpoint"
+os.environ["CHECKPOINT_LOCATION"] = "/Volumes/workspace/default/smart_city_checkpoints/unified_consumer"
 
 os.environ["ELASTICSEARCH_URL"] = "<your-aiven-opensearch-url>"
 os.environ["ELASTICSEARCH_USERNAME"] = "<your-aiven-opensearch-username>"
@@ -618,7 +618,7 @@ Fix:
 Set this environment variable before running `unified_consumer.py`:
 
 ```python
-os.environ["CHECKPOINT_LOCATION"] = "dbfs:/tmp/smart-city-unified-checkpoint"
+os.environ["CHECKPOINT_LOCATION"] = "/Volumes/workspace/default/smart_city_checkpoints/unified_consumer"
 ```
 
 Then rerun:
@@ -630,8 +630,44 @@ exec(open("unified_consumer.py").read())
 If you rerun from scratch and want Databricks to reprocess old Kafka records, use a new checkpoint path:
 
 ```python
-os.environ["CHECKPOINT_LOCATION"] = "dbfs:/tmp/smart-city-unified-checkpoint-v2"
+os.environ["CHECKPOINT_LOCATION"] = "/Volumes/workspace/default/smart_city_checkpoints/unified_consumer_v2"
 ```
+
+---
+
+### Error: Public DBFS root is disabled
+
+Meaning:
+
+```text
+Your workspace blocks dbfs:/tmp checkpoints.
+```
+
+Databricks recommends checkpoint locations in Unity Catalog Volumes, so use a path beginning with:
+
+```text
+/Volumes/
+```
+
+First create a volume by running this in a SQL notebook/cell:
+
+```sql
+CREATE VOLUME IF NOT EXISTS workspace.default.smart_city_checkpoints;
+```
+
+Then set this in your Python env-var cell:
+
+```python
+os.environ["CHECKPOINT_LOCATION"] = "/Volumes/workspace/default/smart_city_checkpoints/unified_consumer"
+```
+
+If `workspace.default` does not exist, run:
+
+```sql
+SHOW CATALOGS;
+```
+
+Use one of the listed catalogs instead of `workspace`, then create/use a schema and volume there.
 
 ---
 
