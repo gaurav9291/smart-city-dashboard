@@ -81,7 +81,7 @@ function Panel({ title, children, wide = false }) {
 }
 
 function App() {
-  const [range, setRange] = React.useState(60);
+  const [range, setRange] = React.useState(1440);
   const [latest, setLatest] = React.useState([]);
   const [summary, setSummary] = React.useState(null);
   const [trends, setTrends] = React.useState([]);
@@ -166,6 +166,8 @@ function App() {
             <option value={30}>Last 30 minutes</option>
             <option value={60}>Last 1 hour</option>
             <option value={180}>Last 3 hours</option>
+            <option value={720}>Last 12 hours</option>
+            <option value={1440}>Last 24 hours</option>
           </select>
           <button onClick={loadData}>Refresh</button>
         </div>
