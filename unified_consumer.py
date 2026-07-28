@@ -1,4 +1,5 @@
 import json
+import os
 import requests
 import time
 from datetime import datetime
@@ -38,6 +39,8 @@ ELASTICSEARCH_AUTH = get_elasticsearch_auth()
 ELASTICSEARCH_TIMEOUT_SECONDS = 30
 ELASTICSEARCH_MAX_RETRIES = 3
 ELASTICSEARCH_RETRY_BACKOFF_SECONDS = 2
+STREAM_TRIGGER = os.getenv("STREAM_TRIGGER", "processingTime").strip().lower()
+STREAM_PROCESSING_TIME = os.getenv("STREAM_PROCESSING_TIME", "30 seconds")
 LOCAL_TIMEZONE = ZoneInfo("Asia/Kolkata")
 EXPECTED_ZONES = ["fc road", "hadapsar", "hinjewadi", "kothrud", "shivajinagar"]
 LATEST_AQI_BY_ZONE = {}
@@ -429,11 +432,18 @@ def process_batch(batch_df, batch_id):
 # 5. Output one latest joined row per zone for each micro-batch.
 install_elasticsearch_index_template()
 
-query = raw_stream.writeStream \
+query_builder = raw_stream.writeStream \
     .foreachBatch(process_batch) \
-    .outputMode("append") \
-    .trigger(processingTime="30 seconds") \
-    .start()
+    .outputMode("append")
+
+if STREAM_TRIGGER in {"availablenow", "available_now"}:
+    query_builder = query_builder.trigger(availableNow=True)
+elif STREAM_TRIGGER == "once":
+    query_builder = query_builder.trigger(once=True)
+else:
+    query_builder = query_builder.trigger(processingTime=STREAM_PROCESSING_TIME)
+
+query = query_builder.start()
 
 print("🏁 Unified Multi-Topic Consumer Online. Emitting latest joined row per zone per batch...")
 query.awaitTermination()

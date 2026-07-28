@@ -338,6 +338,7 @@ os.environ["KAFKA_SECURITY_PROTOCOL"] = "SASL_SSL"
 os.environ["KAFKA_SASL_MECHANISM"] = "PLAIN"
 os.environ["KAFKA_TOPICS"] = "aqi-data,traffic-data,weather-data"
 os.environ["KAFKA_STARTING_OFFSETS"] = "latest"
+os.environ["STREAM_TRIGGER"] = "availableNow"
 
 os.environ["ELASTICSEARCH_URL"] = "<your-aiven-opensearch-url>"
 os.environ["ELASTICSEARCH_USERNAME"] = "<your-aiven-opensearch-username>"
@@ -406,7 +407,7 @@ Run it.
 
 This cell will keep running because streaming jobs are long-running.
 
-That is normal.
+If you set `STREAM_TRIGGER=availableNow`, the cell may finish after processing currently available Kafka records. That is normal on Databricks Serverless/Free Edition.
 
 ---
 
@@ -574,6 +575,32 @@ If you still see this error after pulling the latest code, use non-serverless co
 ```text
 Dedicated access mode
 ```
+
+---
+
+### Error: ProcessingTime is not supported for this cluster type
+
+Meaning:
+
+```text
+Databricks Serverless/Free Edition does not allow an infinite processingTime streaming trigger.
+```
+
+Fix:
+
+Set this environment variable before running `unified_consumer.py`:
+
+```python
+os.environ["STREAM_TRIGGER"] = "availableNow"
+```
+
+Then rerun:
+
+```python
+exec(open("unified_consumer.py").read())
+```
+
+With `availableNow`, Databricks processes the Kafka records currently available and then stops. To process more records later, run the cell again.
 
 ---
 
