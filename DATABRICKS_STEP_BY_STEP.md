@@ -339,6 +339,7 @@ os.environ["KAFKA_SASL_MECHANISM"] = "PLAIN"
 os.environ["KAFKA_TOPICS"] = "aqi-data,traffic-data,weather-data"
 os.environ["KAFKA_STARTING_OFFSETS"] = "latest"
 os.environ["STREAM_TRIGGER"] = "availableNow"
+os.environ["CHECKPOINT_LOCATION"] = "dbfs:/tmp/smart-city-unified-checkpoint"
 
 os.environ["ELASTICSEARCH_URL"] = "<your-aiven-opensearch-url>"
 os.environ["ELASTICSEARCH_USERNAME"] = "<your-aiven-opensearch-username>"
@@ -601,6 +602,36 @@ exec(open("unified_consumer.py").read())
 ```
 
 With `availableNow`, Databricks processes the Kafka records currently available and then stops. To process more records later, run the cell again.
+
+---
+
+### Error: temporary streaming checkpoint locations are not supported
+
+Meaning:
+
+```text
+Databricks Serverless requires you to provide a checkpoint location for streaming.
+```
+
+Fix:
+
+Set this environment variable before running `unified_consumer.py`:
+
+```python
+os.environ["CHECKPOINT_LOCATION"] = "dbfs:/tmp/smart-city-unified-checkpoint"
+```
+
+Then rerun:
+
+```python
+exec(open("unified_consumer.py").read())
+```
+
+If you rerun from scratch and want Databricks to reprocess old Kafka records, use a new checkpoint path:
+
+```python
+os.environ["CHECKPOINT_LOCATION"] = "dbfs:/tmp/smart-city-unified-checkpoint-v2"
+```
 
 ---
 

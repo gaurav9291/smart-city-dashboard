@@ -41,6 +41,10 @@ ELASTICSEARCH_MAX_RETRIES = 3
 ELASTICSEARCH_RETRY_BACKOFF_SECONDS = 2
 STREAM_TRIGGER = os.getenv("STREAM_TRIGGER", "processingTime").strip().lower()
 STREAM_PROCESSING_TIME = os.getenv("STREAM_PROCESSING_TIME", "30 seconds")
+CHECKPOINT_LOCATION = os.getenv(
+    "CHECKPOINT_LOCATION",
+    "dbfs:/tmp/smart-city-unified-checkpoint",
+)
 LOCAL_TIMEZONE = ZoneInfo("Asia/Kolkata")
 EXPECTED_ZONES = ["fc road", "hadapsar", "hinjewadi", "kothrud", "shivajinagar"]
 LATEST_AQI_BY_ZONE = {}
@@ -434,7 +438,8 @@ install_elasticsearch_index_template()
 
 query_builder = raw_stream.writeStream \
     .foreachBatch(process_batch) \
-    .outputMode("append")
+    .outputMode("append") \
+    .option("checkpointLocation", CHECKPOINT_LOCATION)
 
 if STREAM_TRIGGER in {"availablenow", "available_now"}:
     query_builder = query_builder.trigger(availableNow=True)
