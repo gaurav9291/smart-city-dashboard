@@ -413,6 +413,41 @@ If you set `STREAM_TRIGGER=availableNow`, the cell may finish after processing c
 
 ---
 
+## 10A. If Consumer Shows No Records, Run Kafka Smoke Test
+
+Before debugging the full consumer, prove Databricks can read Kafka.
+
+Run this:
+
+```python
+exec(open("databricks_kafka_smoke_test.py").read())
+```
+
+Expected output:
+
+```text
+Rows by Kafka topic:
++------------+-----+
+|topic       |count|
++------------+-----+
+|aqi-data    |...  |
+|traffic-data|...  |
+|weather-data|...  |
++------------+-----+
+```
+
+If all counts are missing or zero, the problem is before Spark processing:
+
+```text
+Render producers -> Aiven Kafka -> Databricks Kafka read
+```
+
+If counts are greater than zero, Kafka is fine and the problem is inside `unified_consumer.py`.
+
+Important: never paste full Kafka config output publicly because it can include your password.
+
+---
+
 ## 11. What Successful Logs Look Like
 
 Good startup:
@@ -618,6 +653,19 @@ Set this environment variable before running `unified_consumer.py`:
 
 ```python
 os.environ["STREAM_TRIGGER"] = "availableNow"
+```
+
+Also confirm Databricks sees it:
+
+```python
+import os
+print(os.environ.get("STREAM_TRIGGER"))
+```
+
+Expected output:
+
+```text
+availableNow
 ```
 
 Then rerun:
