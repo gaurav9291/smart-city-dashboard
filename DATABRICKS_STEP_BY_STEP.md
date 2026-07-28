@@ -448,6 +448,30 @@ Important: never paste full Kafka config output publicly because it can include 
 
 ---
 
+## 10B. Recommended Serverless Fix: Run Batch Consumer
+
+If the smoke test shows Kafka rows but the streaming consumer does not write dashboard records, use the batch consumer.
+
+Run:
+
+```python
+exec(open("databricks_batch_consumer.py").read())
+```
+
+This reads available Kafka records once, joins latest AQI + traffic + weather by zone, writes records to OpenSearch, and exits.
+
+Expected success:
+
+```text
+Kafka rows by topic:
+...
+Indexed 5 records into smart-city-unified.
+```
+
+For a free demo, this is enough. Rerun the same cell whenever you want to refresh dashboard data.
+
+---
+
 ## 11. What Successful Logs Look Like
 
 Good startup:
