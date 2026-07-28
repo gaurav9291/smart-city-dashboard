@@ -336,6 +336,7 @@ os.environ["KAFKA_USERNAME"] = "<your-aiven-kafka-username>"
 os.environ["KAFKA_PASSWORD"] = "<your-aiven-kafka-password>"
 os.environ["KAFKA_SECURITY_PROTOCOL"] = "SASL_SSL"
 os.environ["KAFKA_SASL_MECHANISM"] = "PLAIN"
+os.environ["KAFKA_LOGIN_MODULE"] = "kafkashaded.org.apache.kafka.common.security.plain.PlainLoginModule"
 os.environ["KAFKA_TOPICS"] = "aqi-data,traffic-data,weather-data"
 os.environ["KAFKA_STARTING_OFFSETS"] = "latest"
 os.environ["STREAM_TRIGGER"] = "availableNow"
@@ -499,6 +500,30 @@ KAFKA_SSL_CA_PEM
 ```
 
 Also check Render producers are still running and Aiven Kafka service is running.
+
+---
+
+### Error: No LoginModule found for PlainLoginModule
+
+Meaning:
+
+```text
+Databricks Kafka connector expects the shaded Kafka login module class.
+```
+
+Fix:
+
+Set this environment variable before running `unified_consumer.py`:
+
+```python
+os.environ["KAFKA_LOGIN_MODULE"] = "kafkashaded.org.apache.kafka.common.security.plain.PlainLoginModule"
+```
+
+Then rerun:
+
+```python
+exec(open("unified_consumer.py").read())
+```
 
 ---
 

@@ -72,12 +72,16 @@ def get_spark_kafka_options():
     password = os.getenv("KAFKA_PASSWORD")
     if username and password:
         mechanism = os.getenv("KAFKA_SASL_MECHANISM", "PLAIN")
+        login_module = os.getenv(
+            "KAFKA_LOGIN_MODULE",
+            "org.apache.kafka.common.security.plain.PlainLoginModule",
+        )
         options.update(
             {
                 "kafka.security.protocol": os.getenv("KAFKA_SECURITY_PROTOCOL", "SASL_SSL"),
                 "kafka.sasl.mechanism": mechanism,
                 "kafka.sasl.jaas.config": (
-                    "org.apache.kafka.common.security.plain.PlainLoginModule "
+                    f"{login_module} "
                     f'required username="{username}" password="{password}";'
                 ),
             }
