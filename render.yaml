@@ -27,4 +27,4 @@ services:
       - key: KAFKA_SSL_CA_PEM
         sync: false
       - key: WAQI_TOKEN
-        sync: false
+        value: demo
