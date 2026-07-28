@@ -1,4 +1,34 @@
 import os
+import tempfile
+
+
+_KAFKA_SSL_CAFILE = None
+
+
+def get_kafka_ssl_cafile():
+    global _KAFKA_SSL_CAFILE
+
+    ssl_cafile = os.getenv("KAFKA_SSL_CAFILE")
+    if ssl_cafile:
+        return ssl_cafile
+
+    ssl_ca_pem = os.getenv("KAFKA_SSL_CA_PEM")
+    if not ssl_ca_pem:
+        return None
+
+    if _KAFKA_SSL_CAFILE:
+        return _KAFKA_SSL_CAFILE
+
+    ca_file = tempfile.NamedTemporaryFile(
+        mode="w",
+        prefix="kafka-ca-",
+        suffix=".pem",
+        delete=False,
+    )
+    ca_file.write(ssl_ca_pem.replace("\\n", "\n"))
+    ca_file.close()
+    _KAFKA_SSL_CAFILE = ca_file.name
+    return _KAFKA_SSL_CAFILE
 
 
 def get_kafka_bootstrap_servers():
@@ -24,6 +54,10 @@ def get_kafka_producer_config(value_serializer):
             }
         )
 
+    ssl_cafile = get_kafka_ssl_cafile()
+    if ssl_cafile:
+        config["ssl_cafile"] = ssl_cafile
+
     return config
 
 
@@ -46,6 +80,15 @@ def get_spark_kafka_options():
                     "org.apache.kafka.common.security.plain.PlainLoginModule "
                     f'required username="{username}" password="{password}";'
                 ),
+            }
+        )
+
+    ssl_ca_pem = os.getenv("KAFKA_SSL_CA_PEM")
+    if ssl_ca_pem:
+        options.update(
+            {
+                "kafka.ssl.truststore.type": "PEM",
+                "kafka.ssl.truststore.certificates": ssl_ca_pem.replace("\\n", "\n"),
             }
         )
 

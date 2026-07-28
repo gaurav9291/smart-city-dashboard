@@ -1,10 +1,10 @@
 services:
   - type: web
-    name: smart-city-dashboard
+    name: smart-city-online
     runtime: python
-    plan: starter
+    plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn dashboard_api:app --host 0.0.0.0 --port $PORT
+    startCommand: python online_app.py
     envVars:
       - key: ELASTICSEARCH_INDEX
         value: smart-city-unified
@@ -14,14 +14,6 @@ services:
         sync: false
       - key: ELASTICSEARCH_PASSWORD
         sync: false
-
-  - type: worker
-    name: smart-city-aqi-producer
-    runtime: python
-    plan: starter
-    buildCommand: pip install -r requirements.txt
-    startCommand: python aqi_producer.py
-    envVars:
       - key: KAFKA_BOOTSTRAP_SERVERS
         sync: false
       - key: KAFKA_USERNAME
@@ -32,41 +24,7 @@ services:
         value: SASL_SSL
       - key: KAFKA_SASL_MECHANISM
         value: PLAIN
+      - key: KAFKA_SSL_CA_PEM
+        sync: false
       - key: WAQI_TOKEN
         sync: false
-
-  - type: worker
-    name: smart-city-traffic-producer
-    runtime: python
-    plan: starter
-    buildCommand: pip install -r requirements.txt
-    startCommand: python traffic_producer.py
-    envVars:
-      - key: KAFKA_BOOTSTRAP_SERVERS
-        sync: false
-      - key: KAFKA_USERNAME
-        sync: false
-      - key: KAFKA_PASSWORD
-        sync: false
-      - key: KAFKA_SECURITY_PROTOCOL
-        value: SASL_SSL
-      - key: KAFKA_SASL_MECHANISM
-        value: PLAIN
-
-  - type: worker
-    name: smart-city-weather-producer
-    runtime: python
-    plan: starter
-    buildCommand: pip install -r requirements.txt
-    startCommand: python weather_producer.py
-    envVars:
-      - key: KAFKA_BOOTSTRAP_SERVERS
-        sync: false
-      - key: KAFKA_USERNAME
-        sync: false
-      - key: KAFKA_PASSWORD
-        sync: false
-      - key: KAFKA_SECURITY_PROTOCOL
-        value: SASL_SSL
-      - key: KAFKA_SASL_MECHANISM
-        value: PLAIN
