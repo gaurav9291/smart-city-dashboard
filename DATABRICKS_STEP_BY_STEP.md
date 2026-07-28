@@ -460,6 +460,8 @@ exec(open("databricks_batch_consumer.py").read())
 
 This reads available Kafka records once, joins latest AQI + traffic + weather by zone, writes records to OpenSearch, and exits.
 
+The batch consumer uses `BATCH_STARTING_OFFSETS=earliest` by default, so it can read existing Kafka records even if your streaming env var uses `KAFKA_STARTING_OFFSETS=latest`.
+
 Expected success:
 
 ```text

@@ -196,7 +196,7 @@ def city_alert_for(aqi, congestion_pct, road_closure):
 
 
 kafka_options = get_spark_kafka_options()
-kafka_options["startingOffsets"] = os.getenv("KAFKA_STARTING_OFFSETS", "earliest")
+kafka_options["startingOffsets"] = os.getenv("BATCH_STARTING_OFFSETS", "earliest")
 kafka_options["endingOffsets"] = "latest"
 
 print("Reading available Kafka records once...")
