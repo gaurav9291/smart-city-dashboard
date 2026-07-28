@@ -74,7 +74,7 @@ def get_spark_kafka_options():
         mechanism = os.getenv("KAFKA_SASL_MECHANISM", "PLAIN")
         login_module = os.getenv(
             "KAFKA_LOGIN_MODULE",
-            "org.apache.kafka.common.security.plain.PlainLoginModule",
+            "kafkashaded.org.apache.kafka.common.security.plain.PlainLoginModule",
         )
         options.update(
             {

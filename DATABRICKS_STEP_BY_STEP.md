@@ -340,7 +340,7 @@ os.environ["KAFKA_LOGIN_MODULE"] = "kafkashaded.org.apache.kafka.common.security
 os.environ["KAFKA_TOPICS"] = "aqi-data,traffic-data,weather-data"
 os.environ["KAFKA_STARTING_OFFSETS"] = "latest"
 os.environ["STREAM_TRIGGER"] = "availableNow"
-os.environ["CHECKPOINT_LOCATION"] = "/Volumes/workspace/default/smart_city_checkpoints/unified_consumer"
+os.environ["CHECKPOINT_LOCATION"] = "/Volumes/workspace/default/smart_city_checkpoints/unified_consumer_v2"
 
 os.environ["ELASTICSEARCH_URL"] = "<your-aiven-opensearch-url>"
 os.environ["ELASTICSEARCH_USERNAME"] = "<your-aiven-opensearch-username>"
