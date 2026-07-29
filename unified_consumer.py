@@ -39,7 +39,7 @@ ELASTICSEARCH_AUTH = get_elasticsearch_auth()
 ELASTICSEARCH_TIMEOUT_SECONDS = 30
 ELASTICSEARCH_MAX_RETRIES = 3
 ELASTICSEARCH_RETRY_BACKOFF_SECONDS = 2
-STREAM_TRIGGER = os.getenv("STREAM_TRIGGER", "processingTime").strip().lower()
+STREAM_TRIGGER = os.getenv("STREAM_TRIGGER", "availableNow").strip().lower()
 STREAM_PROCESSING_TIME = os.getenv("STREAM_PROCESSING_TIME", "30 seconds")
 CHECKPOINT_LOCATION = os.getenv(
     "CHECKPOINT_LOCATION",
@@ -267,20 +267,15 @@ def build_cached_unified_documents():
     ]
 
     documents = []
+    processing_time = datetime.now(LOCAL_TIMEZONE).isoformat()
     for norm_zone in complete_zones:
         aqi_doc = LATEST_AQI_BY_ZONE[norm_zone]
         traffic_doc = LATEST_TRAFFIC_BY_ZONE[norm_zone]
         weather_doc = LATEST_WEATHER_BY_ZONE[norm_zone]
 
-        synchronized_time = max(
-            aqi_doc["aqi_kafka_time"],
-            traffic_doc["traffic_kafka_time"],
-            weather_doc["weather_kafka_time"]
-        )
-
         documents.append({
             "zone": aqi_doc["zone"],
-            "synchronized_time": synchronized_time,
+            "synchronized_time": processing_time,
             "aqi_sensor_id": aqi_doc["aqi_sensor_id"],
             "aqi_lat": aqi_doc["aqi_lat"],
             "aqi_lon": aqi_doc["aqi_lon"],

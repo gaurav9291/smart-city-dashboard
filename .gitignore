@@ -1,0 +1,6 @@
+# Local/private credential files
+databricks_scheduled_batch_job.local.py
+
+# Python cache
+__pycache__/
+*.py[cod]

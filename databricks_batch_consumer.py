@@ -279,18 +279,14 @@ joined = (
 )
 
 documents = []
+processing_time = datetime.now(LOCAL_TIMEZONE).isoformat()
 for row in joined.collect():
     doc = normalize_document(row)
-    synchronized_time = max(
-        doc["aqi_kafka_time"],
-        doc["traffic_kafka_time"],
-        doc["weather_kafka_time"],
-    )
     documents.append(
         {
             **doc,
             "zone": doc["zone"],
-            "synchronized_time": synchronized_time,
+            "synchronized_time": processing_time,
             "aqi_status": aqi_status_for(doc["aqi"]),
             "traffic_status": traffic_status_for(doc["road_closure"], doc["congestion_pct"]),
             "weather_condition": weather_condition_for(doc["rainfall_mm"], doc["temperature_c"]),

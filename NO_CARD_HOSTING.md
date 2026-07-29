@@ -1050,6 +1050,8 @@ Open dashboard:
 https://smart-city-online.onrender.com/
 ```
 
+Before Databricks writes the first records, the dashboard may show empty cards or zero values. That is normal. Data appears only after `unified_consumer.py` creates documents in `smart-city-unified`.
+
 ---
 
 ## 15. Correct Startup Order

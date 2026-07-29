@@ -33,6 +33,8 @@ def elasticsearch_request(method, path, **kwargs):
     url = f"{ELASTICSEARCH_URL.rstrip('/')}/{path.lstrip('/')}"
     try:
         response = requests.request(method, url, auth=ELASTICSEARCH_AUTH, timeout=10, **kwargs)
+        if response.status_code == 404 and path.startswith(f"{ELASTICSEARCH_INDEX}/"):
+            return {"hits": {"hits": []}, "aggregations": {}}
         response.raise_for_status()
         return response.json()
     except requests.RequestException as exc:

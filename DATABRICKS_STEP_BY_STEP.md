@@ -462,6 +462,8 @@ This reads available Kafka records once, joins latest AQI + traffic + weather by
 
 The batch consumer uses `BATCH_STARTING_OFFSETS=earliest` by default, so it can read existing Kafka records even if your streaming env var uses `KAFKA_STARTING_OFFSETS=latest`.
 
+The batch consumer writes `synchronized_time` using the current processing time, so each successful run creates fresh records for dashboard filters like last 15 minutes, 30 minutes, and 1 hour.
+
 Expected success:
 
 ```text
@@ -471,6 +473,70 @@ Indexed 5 records into smart-city-unified.
 ```
 
 For a free demo, this is enough. Rerun the same cell whenever you want to refresh dashboard data.
+
+After a successful batch write, test a larger API range first:
+
+```text
+https://smart-city-online.onrender.com/api/summary?range_minutes=1440
+```
+
+Then test the default dashboard. The batch consumer stamps `synchronized_time` with the current processing time so the default dashboard range can find the records.
+
+---
+
+## 10C. Make Dashboard Filters Work Automatically
+
+To make the hosted dashboard update without manual Databricks runs, schedule the batch consumer.
+
+Use this notebook template:
+
+```text
+databricks_scheduled_batch_job.py
+```
+
+Put it in the same Databricks folder as:
+
+```text
+databricks_batch_consumer.py
+cloud_config.py
+```
+
+Open the template in Databricks and replace the placeholder values like:
+
+```text
+<your-aiven-kafka-host:port>
+<your-aiven-kafka-password>
+<your-aiven-opensearch-url>
+```
+
+If Aiven Kafka requires a CA certificate, uncomment the `KAFKA_SSL_CA_PEM` block in that notebook and paste the real certificate.
+
+Then create a scheduled job:
+
+1. Go to **Workflows**.
+2. Click **Create job**.
+3. Task type: **Notebook**.
+4. Notebook: `databricks_scheduled_batch_job.py`.
+5. Compute: the same compute that successfully ran the batch consumer.
+6. Schedule: every 15 minutes.
+7. Click **Run now** once to test.
+
+Expected output:
+
+```text
+Indexed 5 records into smart-city-unified.
+```
+
+After this, dashboard filters behave like this:
+
+```text
+Last 15 minutes -> records from the most recent scheduled run
+Last 30 minutes -> recent one or two runs
+Last 1 hour -> several scheduled runs
+Last 24 hours -> all day
+```
+
+If Free Edition allows a 5-minute schedule, that makes the dashboard feel more live. If not, use 15 minutes.
 
 ---
 
