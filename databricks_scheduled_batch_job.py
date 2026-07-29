@@ -26,7 +26,8 @@ os.environ[
     "KAFKA_LOGIN_MODULE",
 ] = "kafkashaded.org.apache.kafka.common.security.plain.PlainLoginModule"
 os.environ["KAFKA_TOPICS"] = "aqi-data,traffic-data,weather-data"
-os.environ["BATCH_STARTING_OFFSETS"] = "earliest"
+os.environ.pop("BATCH_STARTING_OFFSETS", None)
+os.environ["BATCH_LOOKBACK_MINUTES"] = "30"
 
 
 # COMMAND ----------

@@ -460,7 +460,7 @@ exec(open("databricks_batch_consumer.py").read())
 
 This reads available Kafka records once, joins latest AQI + traffic + weather by zone, writes records to OpenSearch, and exits.
 
-The batch consumer uses `BATCH_STARTING_OFFSETS=earliest` by default, so it can read existing Kafka records even if your streaming env var uses `KAFKA_STARTING_OFFSETS=latest`.
+The batch consumer uses `BATCH_LOOKBACK_MINUTES=30` by default, so scheduled runs read only recent Kafka records instead of scanning all history.
 
 The batch consumer writes `synchronized_time` using the current processing time, so each successful run creates fresh records for dashboard filters like last 15 minutes, 30 minutes, and 1 hour.
 

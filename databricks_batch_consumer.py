@@ -196,10 +196,21 @@ def city_alert_for(aqi, congestion_pct, road_closure):
 
 
 kafka_options = get_spark_kafka_options()
-kafka_options["startingOffsets"] = os.getenv("BATCH_STARTING_OFFSETS", "earliest")
+batch_starting_offsets = os.getenv("BATCH_STARTING_OFFSETS")
+if batch_starting_offsets:
+    kafka_options["startingOffsets"] = batch_starting_offsets
+else:
+    kafka_options.pop("startingOffsets", None)
+    lookback_minutes = int(os.getenv("BATCH_LOOKBACK_MINUTES", "30"))
+    starting_timestamp_ms = int((time.time() - lookback_minutes * 60) * 1000)
+    kafka_options["startingTimestamp"] = str(starting_timestamp_ms)
 kafka_options["endingOffsets"] = "latest"
 
 print("Reading available Kafka records once...")
+if "startingTimestamp" in kafka_options:
+    print(f"Reading Kafka records from the last {lookback_minutes} minutes.")
+else:
+    print(f"Reading Kafka records from startingOffsets={kafka_options['startingOffsets']}.")
 raw_df = (
     spark.read.format("kafka")
     .options(**kafka_options)
